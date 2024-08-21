@@ -17,8 +17,8 @@ This example demonstrates how to use conditional logic within a template to show
 
 ```abap
 * Define a template with conditional rendering
-  DATA(template) = |<%if is_deleted %> Is Deleted = True <%endif%> | &&
-                   |<%ifn is_deleted %> Is Deleted = False <%endifn%>|.
+  DATA(template) = |<%if is_deleted %><p> Is Deleted = True </p><%endif%>| &&
+                   |<%ifn is_deleted %><p> Is Deleted = False </p><%endifn%>|.
 
 * Create an instance of the template engine with the defined template
   DATA(lo_template) = zcl_template_engine=>create( template = template ).
@@ -32,7 +32,10 @@ This example demonstrates how to use conditional logic within a template to show
   DATA: ls_context TYPE lty_context VALUE 'X'.
 
 * Render the template with the context
-  WRITE lo_template->render( ls_context ).
+  cl_demo_output=>display( lo_template->render( ls_context ) ).
+```
+```html
+<p> Is Deleted = True </p>
 ```
 
 ### Loop and Conditional Rendering Example
@@ -42,7 +45,7 @@ This example shows how to render a list of items, applying conditional display b
 * Define a template with a loop and conditional rendering
   DATA(template) = |<% for item in items %>| &&
                    |<% if item-show %>| &&
-                   |<p>Item: <%item-name%></p>| &&
+                   |<p>Item: <%item-name%></p>{ cl_abap_char_utilities=>newline }| &&
                    |<% endif %>| &&
                    |<% endfor %>|.
 
@@ -60,29 +63,39 @@ This example shows how to render a list of items, applying conditional display b
 
 * Initialize context with data
   DATA: ls_context TYPE lty_context.
-  ls_context-items = VALUE #( ( name = 'Item 1' show = abap_true  )
+  ls_context-items = VALUE #( ( name = 'Item 1' show = abap_true )
                               ( name = 'Item 2' show = abap_false )
-                              ( name = 'Item 3' show = abap_true  ) ).
+                              ( name = 'Item 3' show = abap_true ) ).
 
 * Create an instance of the template engine with the defined template
   DATA(lo_template) = zcl_template_engine=>create( template = template ).
 
 * Render the template with the context
-  WRITE lo_template->render( ls_context ).
+  cl_demo_output=>display( lo_template->render( ls_context ) ).
 ```
-
+```html
+<p>Item: Item 1</p>
+<p>Item: Item 3</p>
+```
 ### Repeating Content Example
 This example demonstrates how to repeat a section of the template a specified number of times.
 
 ```abap
 * Define a template to repeat content
-  DATA(template) = |<% do 30 %> <p>Hello World</p> <% enddo %>|.
+  DATA(template) = |<% do 5 %><p>Hello World</p>{ cl_abap_char_utilities=>newline }<% enddo %>|.
 
 * Create an instance of the template engine with the defined template
   DATA(lo_template) = zcl_template_engine=>create( template = template ).
 
 * Render the template
-  WRITE lo_template->render( ).
+  cl_demo_output=>display( lo_template->render( ) ).
+```
+```html
+<p>Hello World</p>
+<p>Hello World</p>
+<p>Hello World</p>
+<p>Hello World</p>
+<p>Hello World</p>
 ```
 
 ### Repeating Content with Context Example
@@ -96,23 +109,28 @@ This example shows how to use a context variable to control the number of repeti
 
 * Initialize context with data
   DATA: ls_context TYPE lty_context.
-  ls_context-count = 3.
+  ls_context-count = 5.
 
 * Define a template to repeat content based on context
-  DATA(template) = |<% do count %> <p>Hello World</p> <% enddo %>|.
+  DATA(template) = |<% do count %><p>Hello World</p>{ cl_abap_char_utilities=>newline }<% enddo %>|.
 
 * Create an instance of the template engine with the defined template
   DATA(lo_template) = zcl_template_engine=>create( template = template ).
 
 * Render the template with the context
-  WRITE lo_template->render( ls_context ).
+  cl_demo_output=>display( lo_template->render( ls_context ) ).
 ```
-
+```html
+<p>Hello World</p>
+<p>Hello World</p>
+<p>Hello World</p>
+<p>Hello World</p>
+<p>Hello World</p>
+```
 ### Partial Templates Example
 This example demonstrates how to use partial templates to modularize and reuse template snippets.
 
 ```abap
-
 * Define partial templates with more descriptive content
   DATA(lo_partial1) = zcl_template_engine=>create(
       |Greetings from Partial 1! Here is the name provided in the context: <%name%>|
@@ -126,10 +144,10 @@ This example demonstrates how to use partial templates to modularize and reuse t
 
 * Define a main template that uses the partial templates
   DATA(lo_template) = zcl_template_engine=>create(
-      |Message from Partial 1: <%@partial1%>| &&
-      |Message from Partial 2: <%@partial2%>| &&
-      |Message from Partial 3: <%@partial3%>| &&
-      |This is the main layout. The name used here is: <%name%>|
+      |<p>Message from Partial 1: <%@partial1%></p>{ cl_abap_char_utilities=>newline }| &&
+      |<p>Message from Partial 2: <%@partial2%></p>{ cl_abap_char_utilities=>newline }| &&
+      |<p>Message from Partial 3: <%@partial3%></p>{ cl_abap_char_utilities=>newline }| &&
+      |<p>This is the main layout. The name used here is: <%name%></p>|
   ).
 
 * Define the context structure including partial templates
@@ -148,7 +166,13 @@ This example demonstrates how to use partial templates to modularize and reuse t
   ls_context-name     = 'TEMPLATE_ENGINE'.
 
 * Render the main template with the context
-  WRITE lo_template->render( ls_context ).
+  cl_demo_output=>display( lo_template->render( ls_context ) ).
+```
+```html
+<p>Message from Partial 1: Greetings from Partial 1! Here is the name provided in the context: TEMPLATE_ENGINE</p>
+<p>Message from Partial 2: Hello from Partial 2! The name in the context is: TEMPLATE_ENGINE</p>
+<p>Message from Partial 3: Welcome from Partial 3! Name accessed from context: TEMPLATE_ENGINE</p>
+<p>This is the main layout. The name used here is: TEMPLATE_ENGINE</p>
 ```
 
 Feel free to adjust any details according to your specific needs or preferences.
